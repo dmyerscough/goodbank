@@ -1,9 +1,13 @@
 const express = require('express');
-const app = express();
+const cors = require('cors')
 
 const auth = require('./middleware/auth-middleware')
-
 const dal = require('./dal.js');
+
+const app = express();
+
+app.use(cors({origin: 'http://localhost:3000'}));
+
 
 // create user account
 app.get('/account/create/:name/:email/:password', auth.checkIfAuthenticated, (req, res) => {
