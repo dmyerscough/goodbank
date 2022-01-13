@@ -93,6 +93,8 @@ app.get('/', (req, res) => {
   res.send('PING');
 })
 
-const port = 3000;
-app.listen(port);
-console.log('Running on port: ' + port);
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, () => {
+  console.log(`Listening on 0.0.0.0:${PORT}`)
+})
