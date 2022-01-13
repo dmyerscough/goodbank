@@ -18,17 +18,16 @@ app.get('/account/create/:name/:email/:password', auth.checkIfAuthenticated, (re
             // if user exists, return error message
             if(users.length > 0){
                 console.log('User already in exists');
-                res.send('User already in exists');    
+                res.status(400).send('User already in exists');    
             }
             else{
                 // else create user
                 dal.create(req.params.name,req.params.email,req.params.password).
                     then((user) => {
                         console.log(user);
-                        res.send(user);            
+                        res.status(200).send(user);            
                     });            
             }
-
         });
 });
 
