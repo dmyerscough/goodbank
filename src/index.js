@@ -88,7 +88,7 @@ app.get('/account/all', auth.checkIfAuthenticated, (req, res) => {
     dal.all().
         then((docs) => {
             console.log(docs);
-            res.send(docs);
+            res.status(200).json(docs);
     });
 });
 
