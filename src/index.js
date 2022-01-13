@@ -89,6 +89,10 @@ app.get('/account/all', auth.checkIfAuthenticated, (req, res) => {
     });
 });
 
+app.get('/', (req, res) => {
+  res.send('PING');
+})
+
 const port = 3000;
 app.listen(port);
 console.log('Running on port: ' + port);
