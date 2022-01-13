@@ -6,7 +6,7 @@ const dal = require('./dal.js');
 
 const app = express();
 
-app.use(cors({origin: 'http://localhost:3000'}));
+app.use(cors({origin: 'http://localhost:3000', optionSuccessStatus:200, credentials:true}));
 
 
 // create user account
