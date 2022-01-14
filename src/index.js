@@ -1,5 +1,6 @@
 const express = require('express');
-const cors = require('cors')
+const cors = require('cors');
+const Joi = require('joi');
 
 const auth = require('./middleware/auth-middleware')
 const dal = require('./dal.js');
