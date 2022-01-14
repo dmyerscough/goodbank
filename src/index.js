@@ -69,7 +69,6 @@ app.put('/account/balance', auth.checkIfAuthenticated, async (req, res) => {
   const requestSchema = Joi.object({
     email: Joi.string().email({ tlds: { allow: false } }).required(),
     amount: Joi.number().required(),
-    action: Joi.string().valid('withdraw', 'deposit').required(),
   });
 
   const { error, value } = requestSchema.validate(req.body);
@@ -79,7 +78,7 @@ app.put('/account/balance', auth.checkIfAuthenticated, async (req, res) => {
   }
 
   try {
-    await dal.update(value.email, value.amount, value.action === 'withdraw')
+    await dal.update(value.email, value.amount)
     res.status(200).json({ status: `The balance of ${value.amount} was ${value.action}`})
   } catch (err) {
     return res.send(500).json({ error: err.message });
