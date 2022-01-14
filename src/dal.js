@@ -45,7 +45,7 @@ function findOne(email){
 }
 
 // update - deposit/withdraw amount
-function update(email, amount, withdraw){
+function update(email, amount){
     return new Promise((resolve, reject) => {
         const customers = db
             .collection('users')            
@@ -57,7 +57,6 @@ function update(email, amount, withdraw){
                     err ? reject(err) : resolve(documents);
                 }
             );            
-        }
     });
 }
 
