@@ -7,80 +7,83 @@ const dal = require('./dal.js');
 const app = express();
 
 app.use(cors({origin: ['http://localhost:3000', 'https://mit-goodbank.netlify.app'], optionSuccessStatus:200, credentials:true}));
-
+app.use(express.json());
 
 // create user account
-app.get('/account/create/:name/:email/:password', auth.checkIfAuthenticated, (req, res) => {
-    // check if account exists
-    dal.find(req.params.email).
-        then((users) => {
+app.post('/account/create', auth.checkIfAuthenticated, async (req, res) => {
+  // Accepted request schema
+  const requestSchema = Joi.object({
+    name: Joi.string().min(3).required().required(),
+    email: Joi.string().required(),
+    password: Joi.string().min(1).max(100).required(),
+  });
 
-            // if user exists, return error message
-            if(users.length > 0){
-                console.log('User already in exists');
-                res.status(400).send('User already in exists');    
-            }
-            else{
-                // else create user
-                dal.create(req.params.name,req.params.email,req.params.password).
-                    then((user) => {
-                        console.log(user);
-                        res.status(200).send(user);            
-                    });            
-            }
-        });
-});
+  const { error, value } = requestSchema.validate(req.body);
 
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
 
-// login user 
-app.get('/account/login/:email/:password', auth.checkIfAuthenticated, (req, res) => {
+  // check if account exists
+  try {
+    const userExist = await dal.find(value.email)
 
-    dal.find(req.params.email).
-        then((user) => {
+    if (userExist.length > 0) {
+      return res.status(400).send('User already in exists')
+    }
+  } catch (err) {
+    return res.status(500).json({ error: err.message })
+  }
 
-            // if user exists, check password
-            if(user.length > 0){
-                if (user[0].password === req.params.password){
-                    res.send(user[0]);
-                }
-                else{
-                    res.send('Login failed: wrong password');
-                }
-            }
-            else{
-                res.send('Login failed: user not found');
-            }
-    });
-    
-});
+  try {
+    dal.create(req.params.name,req.params.email,req.params.password)
+  } catch (err) {
+    return res.status(500).json({ error: err.message })
+  }
 
-// find user account
-app.get('/account/find/:email', auth.checkIfAuthenticated, (req, res) => {
-    dal.find(req.params.email).
-        then((user) => {
-            console.log(user);
-            res.send(user);
-    });
+  return res.status(201).json({ success: 'created user' })
 });
 
 // find one user by email - alternative to find
-app.get('/account/findOne/:email', auth.checkIfAuthenticated, (req, res) => {
-    dal.findOne(req.params.email).
-        then((user) => {
-            console.log(user);
-            res.send(user);
-    });
+app.get('/account/find', auth.checkIfAuthenticated, async (req, res) => {
+  const requestSchema = Joi.object({
+    email: Joi.string().email({ tlds: { allow: false } }).required(),
+  });
+
+  const { error, value } = requestSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+
+  try {
+    const user = await dal.findOne(value.email);
+    return res.send(200).json({ user: user })
+  } catch (err) {
+    return res.send(500).json({ error: err.message });
+  }
 });
 
 // update - deposit/withdraw amount
-app.get('/account/update/:email/:amount', auth.checkIfAuthenticated, (req, res) => {
-    const amount = Number(req.params.amount);
+app.put('/account/balance', auth.checkIfAuthenticated, async (req, res) => {
+  const requestSchema = Joi.object({
+    email: Joi.string().email({ tlds: { allow: false } }).required(),
+    amount: Joi.number().required(),
+    action: Joi.string().valid('withdraw', 'deposit').required(),
+  });
 
-    dal.update(req.params.email, amount).
-        then((response) => {
-            console.log(response);
-            res.send(response);
-    });    
+  const { error, value } = requestSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+
+  try {
+    await dal.update(value.email, value.amount, value.action === 'withdraw')
+    res.status(200).json({ status: `The balance of ${value.amount} was ${value.action}`})
+  } catch (err) {
+    return res.send(500).json({ error: err.message });
+  }
 });
 
 // all accounts
@@ -93,7 +96,7 @@ app.get('/account/all', auth.checkIfAuthenticated, (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('PING');
+  res.send('OK');
 })
 
 const PORT = process.env.PORT || 8080;
