@@ -5,7 +5,21 @@ const Joi = require('joi');
 const auth = require('./middleware/auth-middleware')
 const dal = require('./dal.js');
 
-firebase = require("firebase-admin");
+const firebase = require("firebase/app");
+const firebaseAuth = require("firebase/auth");
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyC6zxrEQocOsB9NVm9oJ9IIaLXPSlBB9qs",
+  authDomain: "mit-badbank-83a55.firebaseapp.com",
+  projectId: "mit-badbank-83a55",
+  storageBucket: "mit-badbank-83a55.appspot.com",
+  messagingSenderId: "906511649276",
+  appId: "1:906511649276:web:68b5f3e0dd547ce8f1ca79"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
 
 const app = express();
 
@@ -39,7 +53,8 @@ app.post('/account/create', auth.checkIfAuthenticated, async (req, res) => {
   }
 
   try {
-    await firebase.auth().createUserWithEmailAndPassword(value.email, value.password)
+    // # firebase.auth().createUserWithEmailAndPassword(emailId, password)
+    await firebaseAuth.auth().createUserWithEmailAndPassword(value.email, value.password)
     await dal.create(value.name ,value.email, val.password)
   } catch (err) {
     return res.status(500).json({ error: err.message })
