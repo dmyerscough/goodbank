@@ -5,6 +5,8 @@ const Joi = require('joi');
 const auth = require('./middleware/auth-middleware')
 const dal = require('./dal.js');
 
+const firebase = require('firebase/auth')
+
 const app = express();
 
 app.use(cors({origin: ['http://localhost:3000', 'https://mit-goodbank.netlify.app'], optionSuccessStatus:200, credentials:true}));
@@ -37,7 +39,8 @@ app.post('/account/create', auth.checkIfAuthenticated, async (req, res) => {
   }
 
   try {
-    dal.create(req.params.name,req.params.email,req.params.password)
+    await firebase.createUserWithEmailAndPassword(firebase.getAuth(), value.email, value.password)
+    await dal.create(value.name ,value.email, val.password)
   } catch (err) {
     return res.status(500).json({ error: err.message })
   }
