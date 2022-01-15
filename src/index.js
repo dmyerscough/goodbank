@@ -5,7 +5,7 @@ const Joi = require('joi');
 const auth = require('./middleware/auth-middleware')
 const dal = require('./dal.js');
 
-firebase = require("firebase");
+firebase = require("firebase-admin");
 
 const app = express();
 
