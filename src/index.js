@@ -53,8 +53,8 @@ app.post('/account/create', auth.checkIfAuthenticated, async (req, res) => {
   }
 
   try {
-    // # firebase.auth().createUserWithEmailAndPassword(emailId, password)
-    await firebaseAuth.auth().createUserWithEmailAndPassword(value.email, value.password)
+    // # await firebaseAuth.createUserWithEmailAndPassword(firebaseAuth.getAuth(), "bob@example.com", "s4fem0de")
+    await firebaseAuth.createUserWithEmailAndPassword(firebaseAuth.getAuth(), value.email, value.password)
     await dal.create(value.name ,value.email, val.password)
   } catch (err) {
     return res.status(500).json({ error: err.message })
