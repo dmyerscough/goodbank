@@ -76,9 +76,9 @@ app.post('/account/find', auth.checkIfAuthenticated, async (req, res) => {
 
   try {
     const user = await dal.findOne(value.email);
-    return res.send(200).json({ user: user })
+    return res.status(200).json({ user: user })
   } catch (err) {
-    return res.send(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
   }
 });
 
