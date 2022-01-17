@@ -63,7 +63,7 @@ app.post('/account/create', auth.checkIfAuthenticated, async (req, res) => {
 });
 
 // find one user by email - alternative to find
-app.get('/account/find', auth.checkIfAuthenticated, async (req, res) => {
+app.post('/account/find', auth.checkIfAuthenticated, async (req, res) => {
   const requestSchema = Joi.object({
     email: Joi.string().email({ tlds: { allow: false } }).required(),
   });
@@ -97,7 +97,11 @@ app.put('/account/balance', auth.checkIfAuthenticated, async (req, res) => {
 
   try {
     await dal.update(value.email, value.amount)
-    res.status(200).json({ status: `The balance of ${value.amount} was ${value.action}`})
+    if (value.amount < 0) {
+        res.status(200).json({ status: `The balance of ${value.amount} was withdrawn` })
+    } else {
+        res.status(200).json({ status: `The balance of ${value.amount} was deposited` })
+    }
   } catch (err) {
     return res.send(500).json({ error: err.message });
   }
