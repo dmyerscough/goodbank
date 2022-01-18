@@ -17,6 +17,13 @@ firebase.initializeApp(firebaseConfig);
 let account;
 
 class AccountsDAO {
+  /**
+   * Inject a MongoDB connection so each method doesn't have to establish their
+   * own connection.
+   *
+   * @param conn
+   * @returns {Promise<void>}
+   */
   static async injectDB(conn) {
     if (account) {
       return;
@@ -28,6 +35,14 @@ class AccountsDAO {
     }
   }
 
+  /**
+   * Create a users within firebase and setup their initial bank account
+   *
+   * @param name
+   * @param email
+   * @param password
+   * @returns {Promise<void>}
+   */
   static async create(name, email, password) {
     try {
       await firebaseAuth.createUserWithEmailAndPassword(firebaseAuth.getAuth(), email, password);
@@ -38,6 +53,12 @@ class AccountsDAO {
     return;
   }
 
+  /**
+   * Search a user based on their email address
+   *
+   * @param email
+   * @returns {Promise<*>}
+   */
   static async find(email) {
     try {
       const person = await account.findOne({ email: email });
@@ -47,6 +68,13 @@ class AccountsDAO {
     }
   }
 
+  /**
+   * Deposit or withdraw a specific amount from a user
+   *
+   * @param email
+   * @param amount
+   * @returns {Promise<string>}
+   */
   static async update(email, amount) {
     try {
       await account.findOneAndUpdate({ email: email }, { $inc: { balance: amount }});
@@ -59,6 +87,11 @@ class AccountsDAO {
     return `The balance of ${amount} was deposited`
   }
 
+  /**
+   * Return all accounts
+   * 
+   * @returns {Promise<*>}
+   */
   static async all() {
     try {
       const accounts = await account.find({}).toArray();
