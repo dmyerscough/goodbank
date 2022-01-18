@@ -6,11 +6,6 @@ const auth = require('../middleware/auth-middleware')
 
 const AccountDAO = require('../models/AccountsDAO');
 
-// /account/create  (POST)
-// /account/find    (GET)
-// /account/balance (PUT)
-// /account/all     (GET)
-
 accountRouter.post("/create", auth.checkIfAuthenticated, async (req, res) => {
   // Accepted request schema
   const requestSchema = Joi.object({
@@ -34,7 +29,7 @@ accountRouter.post("/create", auth.checkIfAuthenticated, async (req, res) => {
   return res.status(201).json({ success: 'created user' })
 });
 
-accountRouter.get("/find", auth.checkIfAuthenticated, async (req, res) => {
+accountRouter.post("/find", auth.checkIfAuthenticated, async (req, res) => {
   const requestSchema = Joi.object({
     email: Joi.string().email({ tlds: { allow: false } }).required(),
   });
@@ -54,12 +49,11 @@ accountRouter.get("/find", auth.checkIfAuthenticated, async (req, res) => {
 });
 
 accountRouter.get("/all", auth.checkIfAuthenticated, async (req, res) => {
-  // Return all account details
   try {
-    const accounts = AccountDAO.all()
+    const accounts = await AccountDAO.all()
     return res.status(200).json(accounts);
-  } catch (error) {
-    return res.send(500).json({ error: err.message });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
   }
 });
 
@@ -76,8 +70,8 @@ accountRouter.put("/balance", auth.checkIfAuthenticated, async (req, res) => {
   }
 
   try {
-    const statement = await AccountDAO.update(value.email, value.amount)
-    return res.status(200).json({ status: statement })
+    const resp = await AccountDAO.update(value.email, value.amount)
+    return res.status(200).json({ status: resp })
   } catch (err) {
     return res.send(500).json({ error: err.message });
   }

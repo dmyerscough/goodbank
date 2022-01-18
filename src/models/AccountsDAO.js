@@ -41,10 +41,10 @@ class AccountsDAO {
   static async find(email) {
     try {
       const person = await account.findOne({ email: email });
+      return person;
     } catch (error) {
       throw error;
     }
-    return person;
   }
 
   static async update(email, amount) {
@@ -61,11 +61,11 @@ class AccountsDAO {
 
   static async all() {
     try {
-      const accounts = await account.find({});
+      const accounts = await account.find({}).toArray();
+      return accounts;
     } catch (error) {
       throw error;
     }
-    return accounts;
   }
 }
 
