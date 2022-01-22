@@ -9,7 +9,7 @@ const accountsRoutes = require('./routes/account-routes');
 
 const app = express();
 
-app.use(cors({origin: ['http://localhost:3000', 'https://mit-goodbank.netlify.app'], optionSuccessStatus:200, credentials:true}));
+app.use(cors({origin: ['http://localhost:3000', 'https://damian-myerscoughfullstackbankingapplication.netlify.app'], optionSuccessStatus:200, credentials:true}));
 app.use(express.json());
 
 app.use("/account", accountsRoutes);
