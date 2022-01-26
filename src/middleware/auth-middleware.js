@@ -22,6 +22,7 @@ const checkIfAuthenticated = (req, res, next) => {
       const userInfo = await admin.auth().verifyIdToken(authToken);
       req.userId = userInfo.user_id;
       req.userEmail = userInfo.email;
+      req.userClaims = userInfo.claims;
       return next();
     } catch (e) {
       return res
