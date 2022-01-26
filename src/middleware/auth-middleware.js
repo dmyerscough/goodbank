@@ -20,10 +20,9 @@ const checkIfAuthenticated = (req, res, next) => {
     try {
       const { authToken } = req;
       const userInfo = await admin.auth().verifyIdToken(authToken);
-      console.log(userInfo);
       req.userId = userInfo.user_id;
       req.userEmail = userInfo.email;
-      req.userClaims = userInfo.claims;
+      req.isAdmin = userInfo.admin ? true : false;
       return next();
     } catch (e) {
       return res
