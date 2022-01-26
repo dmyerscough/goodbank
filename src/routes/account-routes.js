@@ -14,6 +14,10 @@ accountRouter.post("/create", auth.checkIfAuthenticated, async (req, res) => {
     password: Joi.string().min(1).max(100).required(),
   });
 
+  if (!req.isAdmin) {
+    return res.status(401).json({ error: 'permission denied' })
+  }
+
   const { error, value } = requestSchema.validate(req.body);
 
   if (error) {
@@ -40,6 +44,10 @@ accountRouter.post("/find", auth.checkIfAuthenticated, async (req, res) => {
     return res.status(400).json({ error: error.message });
   }
 
+  if (!req.isAdmin && value.email != req.userEmail) {
+    return res.status(401).json( { error: 'permission denied' })
+  }
+
   try {
     const user = await AccountDAO.find(value.email);
     return res.status(200).json({ user: user })
@@ -49,6 +57,10 @@ accountRouter.post("/find", auth.checkIfAuthenticated, async (req, res) => {
 });
 
 accountRouter.get("/all", auth.checkIfAuthenticated, async (req, res) => {
+  if (!req.isAdmin) {
+    return res.status(401).json( { error: 'permission denied' })
+  }
+
   try {
     const accounts = await AccountDAO.all()
     return res.status(200).json(accounts);
@@ -63,14 +75,16 @@ accountRouter.put("/balance", auth.checkIfAuthenticated, async (req, res) => {
     amount: Joi.number().required(),
   });
 
-  console.log(req.userClaims ? req.userClaims : "No Claims");
-  
   const { error, value } = requestSchema.validate(req.body);
 
   if (error) {
     return res.status(400).json({ error: error.message });
   }
 
+  if (!req.isAdmin && value.email != req.userEmail) {
+    return res.status(401).json( { error: 'permission denied' })
+  }
+  
   try {
     const resp = await AccountDAO.update(value.email, value.amount)
     return res.status(200).json({ status: resp })
