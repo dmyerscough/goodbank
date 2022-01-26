@@ -63,7 +63,7 @@ accountRouter.put("/balance", auth.checkIfAuthenticated, async (req, res) => {
     amount: Joi.number().required(),
   });
 
-  console.log(req.user);
+  console.log(req.userClaims);
   
   const { error, value } = requestSchema.validate(req.body);
 
